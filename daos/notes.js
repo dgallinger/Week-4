@@ -18,7 +18,7 @@ module.exports.validateToken = async (token) => {
     if (!foundToken) {
         return false;
     } else {
-        const user = await User.findOne({ email: foundToken.userId });
+        const user = await User.findOne({ _id : foundToken.userId });
         return user._id;
     };
 }
@@ -33,9 +33,16 @@ module.exports.getNotesByUserId = async (userId) => {
     return notes;
 }
 
-module.exports.getById = async (noteId) => {
+module.exports.getById = async (noteId, userId) => {
     if (!mongoose.Types.ObjectId.isValid(noteId)) {
-        return null;
-    } 
-    return Note.findOne({ _id : noteId })
+        //return null;
+        throw new BadDataError('Not valid book id');
+    } else {
+        const note = await Note.findOne({ _id : noteId, userId : userId }).lean();
+        return note;
+    }
+    
 }
+
+class BadDataError extends Error {};
+module.exports.BadDataError = BadDataError;

@@ -106,7 +106,7 @@ describe("/login", () => {
       it("should not store token on user", async () => {
         const res = await request(server).post("/login").send(user);
         const token = res.body.token;
-        const users = await User.find();
+        const users = await User.find().lean();
         users.forEach((user) => {
           expect(Object.values(user)).not.toContain(token);
         });
@@ -119,8 +119,6 @@ describe("/login", () => {
     beforeEach(async () => {
       await request(server).post("/login/signup").send(user0);
       const res0 = await request(server).post("/login").send(user0);
-      console.log(res0.statusCode);
-      console.log(res0.body);
       token0 = res0.body.token;
       await request(server).post("/login/signup").send(user1);
       const res1 = await request(server).post("/login").send(user1);

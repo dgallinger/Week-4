@@ -72,13 +72,11 @@ router.post("/", async (req, res, next) => {
         const success = await loginDAO.login(req.body);
         if (success) {
             res.body = success;
-            console.log(res.body.token);
             res.status(200).json(res.body);  
         } else {
             res.status(401).send('Invalid login credentials');
         }           
     } catch (error)  {
-        console.log(error);
         res.status(500).send(error.message);
         }
 });

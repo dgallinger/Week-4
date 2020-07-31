@@ -17,34 +17,27 @@ module.exports.signUp = async (creds) => {
     } else {
         creds.password = await bcrypt.hash(creds.password, saltRounds);
         user = await User.create(creds);
-        //console.log(user);
         return user;
     };
 }
 
 module.exports.login = async (creds) => {
     const user = await User.findOne({ email : creds.email }).lean();
-    console.log(user);
     if (!user) { 
         return false; 
     };
     const passwordMatch = await bcrypt.compare(creds.password, user.password);
-    //console.log(passwordMatch);
     if (passwordMatch == false) { 
         return false; 
     } else {
-        const newToken = await Token.create({ token: uuid(), userId : creds.email });
-        //console.log(newToken);
+        const newToken = await Token.create({ token: uuid(), userId : user._id });
         return newToken; 
     }; 
 }
 
 module.exports.logout = async (creds) => {
     const token = await creds.split(' ')[1];
-    console.log(creds);
-    console.log(token);
     const success = await Token.findOne({ token : token });
-    //console.log(success);
     if (!success) {
         return false;
     } else {
@@ -56,13 +49,12 @@ module.exports.logout = async (creds) => {
 module.exports.changePassword = async (auth, password) => {
     const token = await auth.split(' ')[1];
     const foundToken = await Token.findOne({ token : token });
-    //console.log(foundToken)
     if (!foundToken) {
         return false;
     } else {
         try {
             password = await bcrypt.hash(password, saltRounds);
-            await User.updateOne({ 'email' : foundToken.userId }, { $set: { 'password' : password}});
+            await User.updateOne({ _id : foundToken.userId }, { $set: { 'password' : password}});
             return true;
         } catch (err) {
             throw err;
@@ -71,5 +63,5 @@ module.exports.changePassword = async (auth, password) => {
     };
 }
 
-class BadDataError extends Error {};
-module.exports.BadDataError = BadDataError;
+// class BadDataError extends Error {};
+// module.exports.BadDataError = BadDataError;
