@@ -119,6 +119,8 @@ describe("/login", () => {
     beforeEach(async () => {
       await request(server).post("/login/signup").send(user0);
       const res0 = await request(server).post("/login").send(user0);
+      console.log(res0.statusCode);
+      console.log(res0.body);
       token0 = res0.body.token;
       await request(server).post("/login/signup").send(user1);
       const res1 = await request(server).post("/login").send(user1);
